@@ -11,6 +11,10 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private lateinit var card: CardModel
     private lateinit var card2: CardModel
 
+    private val models: MutableList<CardModel> = mutableListOf()
+
+    private var projectionMatrix = FloatArray(16)
+
     private val shader = Shader(
         vertex = R.raw.vertex,
         fragment = R.raw.fragment
@@ -32,6 +36,7 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         card.setCardArea(1f, 1f)
         //card.setTexCoordArea(0f,0f, 0.5f, 1f)
         card.load(context)
+        models.add(card)
 
         card2 = CardModel()
         card2.position[0] = 1f
@@ -52,14 +57,21 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+
+        val ratio: Float = width.toFloat() / height.toFloat()
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+
+        val viewMatrix = FloatArray(16)
+        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -6f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+
+        Matrix.multiplyMM(projectionMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
     }
 
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        card.update()
-        card2.update()
 
-        card.draw(shader)
-        //card2.draw(shader)
+        models.forEach { it.update(projectionMatrix) }
+
+        models.forEach { it.draw(shader) }
     }
 }

@@ -76,14 +76,6 @@ class CardModel {
         )
     }
 
-    fun setCardFront(x: Float, y: Float, width: Float, height: Float) {
-
-    }
-
-    fun setCardBack(x: Float, y: Float, width: Float, height: Float) {
-
-    }
-
     fun setTexCoordArea(x: Float, y: Float, width: Float, height: Float) {
         textCoordinates = floatArrayOf(
             // front
@@ -113,13 +105,10 @@ class CardModel {
         onUpdateCallback = callback
     }
 
-    fun update() {
+    fun update(projection: FloatArray) {
         Matrix.setIdentityM(mvp, 0)
-        Matrix.setIdentityM(mvp, 0)
-        //Matrix.scaleM(mvp, 0, 0.25f, 0.25f, 1.0f)
-        //Matrix.translateM(mvp, 0, position[0], position[1], position[2])
-
         onUpdateCallback(mvp)
+        Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
     }
 
     fun draw(shader: Shader) {
