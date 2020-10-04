@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLUtils
 
-
 object TextureUtils {
     fun loadTexture(context: Context, resourceId: Int): Int {
         val textureHandle = IntArray(1)

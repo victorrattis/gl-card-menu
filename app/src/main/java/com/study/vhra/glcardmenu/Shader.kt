@@ -1,8 +1,11 @@
 package com.study.vhra.glcardmenu
 
+import android.opengl.GLES10
 import android.opengl.GLES20
 import android.util.Log
 import java.nio.IntBuffer
+import javax.microedition.khronos.opengles.GL10
+
 
 class Shader(
     val vertex: Int,
@@ -31,6 +34,12 @@ class Shader(
         return GLES20.glGetUniformLocation(id, uniformName)
     }
 
+    fun dump() {
+        Log.d("devlog", "MAX Texture size: ${getMaxTextureSize()}")
+        Log.d("devlog", "getActiveAttributes: ${getActiveAttributes()}")
+        Log.d("devlog", "getActiveUniforms: ${getActiveUniforms()}")
+    }
+
     private fun getActiveAttributes(): Int {
         val result = IntBuffer.allocate(1)
         GLES20.glGetProgramiv(id, GLES20.GL_ACTIVE_ATTRIBUTES, result)
@@ -41,5 +50,11 @@ class Shader(
         val result = IntBuffer.allocate(1)
         GLES20.glGetProgramiv(id, GLES20.GL_ACTIVE_UNIFORMS, result)
         return result.get(0)
+    }
+
+    private fun getMaxTextureSize(): Int {
+        val maxTextureSize = IntArray(1)
+        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0)
+        return maxTextureSize[0]
     }
 }

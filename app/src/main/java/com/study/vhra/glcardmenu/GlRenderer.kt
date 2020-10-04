@@ -3,6 +3,7 @@ package com.study.vhra.glcardmenu
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.opengl.Matrix
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -18,20 +19,35 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
 
+        GLES20.glEnable(GLES20.GL_CULL_FACE)
+        GLES20.glCullFace(GLES20.GL_BACK)
+
         val shaderLoader = ShaderLoader(context)
         shaderLoader.load(shader)
+        shader.dump()
 
         card = CardModel()
-        card.position[0] = -0.6f
-        card.texture = R.drawable.texture
+        card.position[0] = -1f
+        card.texture = R.drawable.card_sprints
+        card.setCardArea(1f, 1f)
+        //card.setTexCoordArea(0f,0f, 0.5f, 1f)
         card.load(context)
 
         card2 = CardModel()
-        card2.position[0] = 0.5f
-        card2.texture = R.drawable.texture2
+        card2.position[0] = 1f
+        card2.texture = R.drawable.card_sprints
+        card2.setCardArea(2f, 2f)
+        card2.setTexCoordArea(0.5f,0f, 0.5f, 1f)
         card2.load(context)
 
         shader.useProgram()
+
+        var angle = 0f
+        card.setOnUpdate { matrix ->
+            angle += 1
+            if (angle > 360f) angle = 0f
+            Matrix.rotateM(matrix, 0, angle, 0f, 1f, 0f)
+        }
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -40,7 +56,10 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        card.update()
+        card2.update()
+
         card.draw(shader)
-        card2.draw(shader)
+        //card2.draw(shader)
     }
 }
