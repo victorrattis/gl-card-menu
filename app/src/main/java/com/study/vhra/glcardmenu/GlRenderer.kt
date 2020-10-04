@@ -8,6 +8,7 @@ import javax.microedition.khronos.opengles.GL10
 
 class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private lateinit var card: CardModel
+    private lateinit var card2: CardModel
 
     private val shader = Shader(
         vertex = R.raw.vertex,
@@ -22,7 +23,13 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         card = CardModel()
         card.position[0] = -0.6f
+        card.texture = R.drawable.texture
         card.load(context)
+
+        card2 = CardModel()
+        card2.position[0] = 0.5f
+        card2.texture = R.drawable.texture2
+        card2.load(context)
 
         shader.useProgram()
     }
@@ -34,5 +41,6 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         card.draw(shader)
+        card2.draw(shader)
     }
 }

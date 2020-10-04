@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.Matrix
 import com.study.vhra.glcardmenu.utils.BufferUtils
+import com.study.vhra.glcardmenu.utils.TextureUtils
 import java.nio.FloatBuffer
 import java.nio.ShortBuffer
 
@@ -24,6 +25,13 @@ class CardModel {
         0.5f,  0.5f
     )
 
+    private lateinit var textCoordBuffer: FloatBuffer
+    private var textCoordinates = floatArrayOf(
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
+    )
 
     private lateinit var indexBuffer: ShortBuffer
     private val indices = shortArrayOf(
@@ -38,24 +46,24 @@ class CardModel {
     private fun getVertexCapacity(): Int = vertices.size * COORDINATE_BYTES
 
     var position: FloatArray = FloatArray(3)
+    var texture: Int = 0
+
+    var mTextureDataHandle: Int = 0
 
     fun load(context: Context) {
         vertexBuffer = BufferUtils.createFloatBuffer(vertices, getVertexCapacity())
         indexBuffer = BufferUtils.createShortBuffer(indices, indices.size * 2)
-
+        textCoordBuffer = BufferUtils.createFloatBuffer(textCoordinates, textCoordinates.size * 4)
+        mTextureDataHandle = TextureUtils.loadTexture(context, texture);
+        
         Matrix.setIdentityM(mvp, 0);
         Matrix.translateM(mvp, 0, position[0], position[1], position[2])
-
-        val textureHandle = IntArray(1)
-        GLES20.glGenTextures(1, textureHandle, 0)
-
-        val options = BitmapFactory.Options()
-        options.inScaled = false // No pre-scaling
-
-        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.texture, options)
     }
 
     fun draw(shader: Shader) {
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureDataHandle);
+
         GLES20.glUniformMatrix4fv(
             shader.getUniform("mvp"),
             1,
@@ -64,6 +72,8 @@ class CardModel {
             0
         )
 
+        GLES20.glUniform1i(shader.getUniform("uTexture"), 0);
+
         GLES20.glVertexAttribPointer(
             shader.getAttribute("aPosition"),
             COORDINATE_FOR_VERTEX,
@@ -71,6 +81,15 @@ class CardModel {
             false,
             VERTEX_BYTES,
             vertexBuffer
+        )
+
+        GLES20.glVertexAttribPointer(
+            shader.getAttribute("aTexCoord"),
+            2,
+            GLES20.GL_FLOAT,
+            false,
+            2 * 4,
+            textCoordBuffer
         )
 
         GLES20.glDrawElements(
