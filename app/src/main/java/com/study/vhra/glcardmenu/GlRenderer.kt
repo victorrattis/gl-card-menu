@@ -4,6 +4,7 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import android.util.Log
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -14,6 +15,8 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private val models: MutableList<CardModel> = mutableListOf()
 
     private var projectionMatrix = FloatArray(16)
+
+    private var screenSize: IntArray = intArrayOf()
 
     private val shader = Shader(
         vertex = R.raw.vertex,
@@ -62,6 +65,7 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+        screenSize = intArrayOf(width, height)
 
         val ratio: Float = width.toFloat() / height.toFloat()
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
@@ -81,5 +85,18 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         models.forEach { it.update(projectionMatrix) }
 
         models.forEach { it.draw(shader) }
+    }
+
+    fun onTouchEvent(x: Float, y: Float) {
+        // convert touch x and y to OpenGL coordinate system
+        val glPosition = convertGlCoordinateSystem(x, y)
+        Log.d("devlog", "Touch GL position: x= ${glPosition[0]}, y= ${glPosition[1]}")
+    }
+
+    private fun convertGlCoordinateSystem(x: Float, y: Float): FloatArray {
+        return floatArrayOf(
+            (x / screenSize[0]) * 2f - 1f,
+            1 - (y / screenSize[1]) * 2f
+        )
     }
 }
