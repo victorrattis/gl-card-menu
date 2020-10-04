@@ -5,7 +5,6 @@ import android.opengl.GLES20.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-
 class ShaderLoader(private val context: Context) {
     fun load(shader: Shader) {
         try {
