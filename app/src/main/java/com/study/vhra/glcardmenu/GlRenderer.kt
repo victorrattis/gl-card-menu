@@ -41,9 +41,14 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         card2 = CardModel()
         card2.position[0] = 1f
         card2.texture = R.drawable.card_sprints
-        card2.setCardArea(2f, 2f)
-        card2.setTexCoordArea(0.5f,0f, 0.5f, 1f)
+        card2.setCardArea(1f, 1f)
+        //card2.setTexCoordArea(0.5f,0f, 0.5f, 1f)
         card2.load(context)
+        card2.setOnUpdate { matrix ->
+            Matrix.translateM(matrix, 0, 1f, 1f, 0f)
+        }
+
+        models.add(card2)
 
         shader.useProgram()
 
@@ -61,10 +66,13 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         val ratio: Float = width.toFloat() / height.toFloat()
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
 
-        val viewMatrix = FloatArray(16)
-        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -6f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+        val camera = Camera3D(
+            eye = floatArrayOf(0f, 0f, -6f),
+            center = floatArrayOf(0f, 0f, 0f),
+            up = floatArrayOf(0f, 1f, 0f)
+        )
 
-        Matrix.multiplyMM(projectionMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
+        Matrix.multiplyMM(projectionMatrix, 0, projectionMatrix, 0, camera.getMatrix(), 0)
     }
 
     override fun onDrawFrame(gl: GL10?) {
