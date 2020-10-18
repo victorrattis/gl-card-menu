@@ -9,8 +9,10 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
-    private lateinit var card: CardModel
-    private lateinit var card2: CardModel
+    companion object {
+        const val CARD_WIDTH = 0.64f
+        const val CARD_HEIGHT = 1f
+    }
 
     private val models: MutableList<CardModel> = mutableListOf()
 
@@ -33,34 +35,53 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         shaderLoader.load(shader)
         shader.dump()
 
-        card = CardModel()
-        card.position[0] = -1f
-        card.texture = R.drawable.card_sprints
-        card.setCardArea(1f, 1f)
-        //card.setTexCoordArea(0f,0f, 0.5f, 1f)
-        card.load(context)
-        models.add(card)
+        val textureSize = floatArrayOf(2015f, 1948f)
 
-        card2 = CardModel()
-        card2.position[0] = 1f
-        card2.texture = R.drawable.card_sprints
-        card2.setCardArea(1f, 1f)
-        //card2.setTexCoordArea(0.5f,0f, 0.5f, 1f)
-        card2.load(context)
-        card2.setOnUpdate { matrix ->
-            Matrix.translateM(matrix, 0, 1f, 1f, 0f)
-        }
 
-        models.add(card2)
+        models.add(CardModel().apply {
+            position[0] = -1f
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(0f, 0f, 0.097766749f, 0.140143737f)
+            setBackCoordinateText(1213f/textureSize[0], 0f, 1408f/textureSize[0], 272/textureSize[1])
+            var angle = 0f
+            setOnUpdate { matrix ->
+                angle += 1
+                if (angle > 360f) angle = 0f
+                Matrix.rotateM(matrix, 0, angle, 0f, 1f, 0f)
+            }
+        })
+
+        models.add(CardModel().apply {
+            position[0] = 1f
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(203f/textureSize[0], 0f, 398f/textureSize[0], 273f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 0f, 1408f/textureSize[0], 272/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, 0f, 1f, 0f)
+            }
+        })
+
+        models.add(CardModel().apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(809f/textureSize[0], 1396f/textureSize[1], 1004f/textureSize[0], 1668f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+            }
+            var angle = 0f
+            setOnUpdate { matrix ->
+                angle += 1
+                if (angle > 360f) angle = 0f
+                Matrix.translateM(matrix, 0, CARD_WIDTH + 0.02f, 1f, 0f)
+                Matrix.rotateM(matrix, 0, angle, 0f, -1f, 0f)
+            }
+        })
+
+        models.forEach { it.load(context) }
 
         shader.useProgram()
-
-        var angle = 0f
-        card.setOnUpdate { matrix ->
-            angle += 1
-            if (angle > 360f) angle = 0f
-            Matrix.rotateM(matrix, 0, angle, 0f, 1f, 0f)
-        }
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {

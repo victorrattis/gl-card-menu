@@ -56,6 +56,9 @@ class CardModel {
     var position: FloatArray = FloatArray(3)
     var texture: Int = 0
 
+    private var frontCoordText = floatArrayOf(0f, 0f, 0.5f, 1f)
+    private var backCoordText = floatArrayOf(0.5f, 0f, 1f, 1f)
+
     var mTextureDataHandle: Int = 0
 
     fun setCardArea(width: Float, height: Float) {
@@ -69,6 +72,7 @@ class CardModel {
             startX, startY,
             startX + width, startY,
             startX + width,  startY + height,
+
             startX,  startY + height,
             startX, startY,
             startX + width, startY,
@@ -76,22 +80,33 @@ class CardModel {
         )
     }
 
-    fun setTexCoordArea(x: Float, y: Float, width: Float, height: Float) {
+    fun setFrontCoordinateText(startX: Float, startY: Float, endX: Float, endY: Float) {
+        frontCoordText = floatArrayOf(startX, startY, endX, endY)
+    }
+
+    fun setBackCoordinateText(startX: Float, startY: Float, endX: Float, endY: Float) {
+        backCoordText = floatArrayOf(startX, startY, endX, endY)
+    }
+
+    private fun loadCoordinateTexture() {
         textCoordinates = floatArrayOf(
-            // front
-            x, y,
-            x, y + height,
-            x + width, y + height,
-            x + width, y,
             // back
-            x, y,
-            x, y + height,
-            x + width, y + height,
-            x + width, y
+            backCoordText[2], backCoordText[1],
+            backCoordText[2], backCoordText[3],
+            backCoordText[0], backCoordText[3],
+            backCoordText[0], backCoordText[1],
+
+            // front
+            frontCoordText[2], frontCoordText[1],
+            frontCoordText[2], frontCoordText[3],
+            frontCoordText[0], frontCoordText[3],
+            frontCoordText[0], frontCoordText[1]
         )
     }
 
     fun load(context: Context) {
+        loadCoordinateTexture()
+
         vertexBuffer = BufferUtils.createFloatBuffer(vertices, getVertexCapacity())
         indexBuffer = BufferUtils.createShortBuffer(indices, indices.size * 2)
         textCoordBuffer = BufferUtils.createFloatBuffer(textCoordinates, textCoordinates.size * 4)
