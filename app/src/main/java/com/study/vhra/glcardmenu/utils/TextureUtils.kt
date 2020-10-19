@@ -10,8 +10,11 @@ object TextureUtils {
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
         if (textureHandle[0] != 0) {
-            val options = BitmapFactory.Options().also { it.inScaled = false }
-            val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options)
+            val bitmap = BitmapFactory.decodeResource(
+                context.resources,
+                resourceId,
+                BitmapFactory.Options().also { it.inScaled = false }
+            )
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
             GLES20.glTexParameteri(

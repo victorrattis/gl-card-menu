@@ -5,6 +5,7 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.util.Log
+import com.study.vhra.glcardmenu.utils.TextureLoader
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -13,6 +14,8 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         const val CARD_WIDTH = 0.64f
         const val CARD_HEIGHT = 1f
     }
+
+    private lateinit var textureLoader: TextureLoader
 
     private val models: MutableList<CardModel> = mutableListOf()
 
@@ -28,6 +31,8 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
 
+        textureLoader = TextureLoader(context)
+
         GLES20.glEnable(GLES20.GL_CULL_FACE)
         GLES20.glCullFace(GLES20.GL_BACK)
 
@@ -37,9 +42,7 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         val textureSize = floatArrayOf(2015f, 1948f)
 
-
         models.add(CardModel().apply {
-            position[0] = -1f
             texture = R.drawable.card_textures
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
             setFrontCoordinateText(0f, 0f, 0.097766749f, 0.140143737f)
@@ -53,7 +56,6 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         })
 
         models.add(CardModel().apply {
-            position[0] = 1f
             texture = R.drawable.card_textures
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
             setFrontCoordinateText(203f/textureSize[0], 0f, 398f/textureSize[0], 273f/textureSize[1])
@@ -68,8 +70,6 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
             setFrontCoordinateText(809f/textureSize[0], 1396f/textureSize[1], 1004f/textureSize[0], 1668f/textureSize[1])
             setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
-            setOnUpdate { matrix ->
-            }
             var angle = 0f
             setOnUpdate { matrix ->
                 angle += 1
@@ -79,7 +79,7 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
             }
         })
 
-        models.forEach { it.load(context) }
+        models.forEach { it.load(textureLoader) }
 
         shader.useProgram()
     }
@@ -89,10 +89,10 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         screenSize = intArrayOf(width, height)
 
         val ratio: Float = width.toFloat() / height.toFloat()
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 20f)
 
         val camera = Camera3D(
-            eye = floatArrayOf(0f, 0f, -6f),
+            eye = floatArrayOf(0f, 0f, -10f),
             center = floatArrayOf(0f, 0f, 0f),
             up = floatArrayOf(0f, 1f, 0f)
         )

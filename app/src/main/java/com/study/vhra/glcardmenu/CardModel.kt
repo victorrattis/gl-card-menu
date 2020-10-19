@@ -1,10 +1,9 @@
 package com.study.vhra.glcardmenu
 
-import android.content.Context
 import android.opengl.GLES20
 import android.opengl.Matrix
 import com.study.vhra.glcardmenu.utils.BufferUtils
-import com.study.vhra.glcardmenu.utils.TextureUtils
+import com.study.vhra.glcardmenu.utils.TextureLoader
 import java.nio.FloatBuffer
 import java.nio.ShortBuffer
 
@@ -104,15 +103,14 @@ class CardModel {
         )
     }
 
-    fun load(context: Context) {
+    fun load(textureLoader: TextureLoader) {
         loadCoordinateTexture()
 
         vertexBuffer = BufferUtils.createFloatBuffer(vertices, getVertexCapacity())
         indexBuffer = BufferUtils.createShortBuffer(indices, indices.size * 2)
         textCoordBuffer = BufferUtils.createFloatBuffer(textCoordinates, textCoordinates.size * 4)
-        mTextureDataHandle = TextureUtils.loadTexture(context, texture)
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        mTextureDataHandle = textureLoader.loadTexture(texture)
     }
 
     var onUpdateCallback: (matrix: FloatArray) -> Unit = {}
