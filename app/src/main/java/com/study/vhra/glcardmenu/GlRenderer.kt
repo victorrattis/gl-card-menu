@@ -29,12 +29,17 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     )
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+        GLES20.glClearColor(0.86f, 0.86f, 0.86f, 1.0f)
 
         textureLoader = TextureLoader(context)
 
         GLES20.glEnable(GLES20.GL_CULL_FACE)
         GLES20.glCullFace(GLES20.GL_BACK)
+
+        // Enable z depth
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+        GLES20.glDepthFunc(GLES20.GL_LESS)
+        GLES20.glDepthMask(true)
 
         val shaderLoader = ShaderLoader(context)
         shaderLoader.load(shader)
@@ -45,8 +50,8 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         models.add(CardModel("card 0").apply {
             texture = R.drawable.card_textures
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
-            setFrontCoordinateText(0f, 0f, 0.097766749f, 0.140143737f)
-            setBackCoordinateText(1213f/textureSize[0], 0f, 1408f/textureSize[0], 272/textureSize[1])
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[0], 1408f/textureSize[0], 272f/textureSize[1])
             var angle = 0f
             setOnUpdate { matrix ->
                 angle += 1
@@ -58,23 +63,23 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         models.add(CardModel("card 1").apply {
             texture = R.drawable.card_textures
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
-            setFrontCoordinateText(203f/textureSize[0], 0f, 398f/textureSize[0], 273f/textureSize[1])
-            setBackCoordinateText(1213f/textureSize[0], 0f, 1408f/textureSize[0], 272/textureSize[1])
+            setFrontCoordinateText(205f/textureSize[0], 3f/textureSize[1], 397f/textureSize[0], 272f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
             setOnUpdate { matrix ->
-                Matrix.translateM(matrix, 0, 0f, 1f, 0f)
+                Matrix.translateM(matrix, 0, 0f, 1f + 0.02f, 0f)
             }
         })
 
         models.add(CardModel("card 2").apply {
             texture = R.drawable.card_textures
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
-            setFrontCoordinateText(809f/textureSize[0], 1396f/textureSize[1], 1004f/textureSize[0], 1668f/textureSize[1])
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
             setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
             var angle = 0f
             setOnUpdate { matrix ->
                 angle += 1
                 if (angle > 360f) angle = 0f
-                Matrix.translateM(matrix, 0, CARD_WIDTH + 0.02f, 1f, 0f)
+                Matrix.translateM(matrix, 0, CARD_WIDTH + 0.02f, 1f + 0.02f, 0f)
                 Matrix.rotateM(matrix, 0, angle, 0f, -1f, 0f)
             }
         })
@@ -101,7 +106,7 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
         models.forEach { it.update(projectionMatrix) }
 

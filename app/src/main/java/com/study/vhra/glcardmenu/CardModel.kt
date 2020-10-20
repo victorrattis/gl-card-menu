@@ -128,9 +128,13 @@ class CardModel constructor(private val name: String = "default") {
     fun update(projection: FloatArray) {
         Matrix.setIdentityM(mvp, 0)
 
-        onUpdateCallback(mvp)
         if (selected) {
+            Matrix.translateM(mvp, 0, 0f, 0f, -1f)
+            onUpdateCallback(mvp)
             Matrix.scaleM(mvp, 0, 1.25f, 1.25f, 1f)
+        } else {
+
+            onUpdateCallback(mvp)
         }
         Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
     }
