@@ -27,9 +27,9 @@ class CardFlipAnimation : Animation {
             Matrix.rotateM(matrix, 0, start + (angle * percentage / 100f), 0f, -1f, 0f)
             Matrix.translateM(matrix, 0, -width / 2f, 0f, 0f)
         } else {
-            Matrix.translateM(matrix, 0, (width / 2f) - (width - result), 0f, 0f)
-            Matrix.rotateM(matrix, 0, start - (angle * percentage / 100f), 0f, -1f, 0f)
-            Matrix.translateM(matrix, 0, -(width / 2f), 0f, 0f)
+            Matrix.translateM(matrix, 0, -(width / 2f) + (width - result), 0f, 0f)
+            Matrix.rotateM(matrix, 0, start + (angle * percentage / 100f), 0f, -1f, 0f)
+            Matrix.translateM(matrix, 0, (width / 2f), 0f, 0f)
         }
     }
 

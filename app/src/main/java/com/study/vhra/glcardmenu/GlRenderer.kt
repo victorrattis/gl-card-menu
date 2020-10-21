@@ -79,6 +79,66 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
             }
         })
 
+        models.add(CardModel("card 3").apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, -(CARD_WIDTH + 0.02f), 1f + 0.02f, 0f)
+            }
+        })
+
+        models.add(CardModel("card 4").apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, -(CARD_WIDTH + 0.02f), -(1f + 0.02f), 0f)
+            }
+        })
+
+        models.add(CardModel("card 5").apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, -(CARD_WIDTH + 0.02f), 0f, 0f)
+            }
+        })
+
+        models.add(CardModel("card 6").apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, (CARD_WIDTH + 0.02f), 0f, 0f)
+            }
+        })
+
+        models.add(CardModel("card 7").apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, (CARD_WIDTH + 0.02f), -(1f + 0.02f), 0f)
+            }
+        })
+
+        models.add(CardModel("card 8").apply {
+            texture = R.drawable.card_textures
+            setCardArea(CARD_WIDTH, CARD_HEIGHT)
+            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
+            setOnUpdate { matrix ->
+                Matrix.translateM(matrix, 0, 0f, -(1f + 0.02f), 0f)
+            }
+        })
+
         models.forEach { it.load(textureLoader) }
 
         shader.useProgram()
