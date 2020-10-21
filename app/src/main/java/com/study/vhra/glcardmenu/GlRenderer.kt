@@ -4,10 +4,14 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import android.util.Log
+import com.study.vhra.glcardmenu.anim.CardFlipAnimation
+import com.study.vhra.glcardmenu.anim.RotateAnimation
+import com.study.vhra.glcardmenu.utils.ShaderLoader
 import com.study.vhra.glcardmenu.utils.TextureLoader
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.max
+import kotlin.math.min
 
 class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     companion object {
@@ -50,14 +54,9 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
         models.add(CardModel("card 0").apply {
             texture = R.drawable.card_textures
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
-            setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
+            setFrontCoordinateText(3f/textureSize[0], 3f/textureSize[1], 196f/textureSize[0], 273f/textureSize[1])
             setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[0], 1408f/textureSize[0], 272f/textureSize[1])
-            var angle = 0f
-            setOnUpdate { matrix ->
-                angle += 1
-                if (angle > 360f) angle = 0f
-                Matrix.rotateM(matrix, 0, angle, 0f, 1f, 0f)
-            }
+            setOnUpdate { }
         })
 
         models.add(CardModel("card 1").apply {
@@ -75,12 +74,8 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
             setCardArea(CARD_WIDTH, CARD_HEIGHT)
             setFrontCoordinateText(811f/textureSize[0], 1398f/textureSize[1], 1003f/textureSize[0], 1667f/textureSize[1])
             setBackCoordinateText(1213f/textureSize[0], 1f/textureSize[1], 1408f/textureSize[0], 272f/textureSize[1])
-            var angle = 0f
             setOnUpdate { matrix ->
-                angle += 1
-                if (angle > 360f) angle = 0f
                 Matrix.translateM(matrix, 0, CARD_WIDTH + 0.02f, 1f + 0.02f, 0f)
-                Matrix.rotateM(matrix, 0, angle, 0f, -1f, 0f)
             }
         })
 
@@ -116,9 +111,19 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
     fun onTouchEvent(x: Float, y: Float) {
         // convert touch x and y to OpenGL coordinate system
         val glPosition = convertGlCoordinateSystem(x, y)
-        Log.d("devlog", "Touch GL position: x= ${glPosition[0]}, y= ${glPosition[1]}")
 
-        models.forEach { it.measure(glPosition, projectionMatrix) }
+        models.forEach {
+            val rectangle = it.measure()
+            if (collisionRectangle(rectangle, glPosition)) {
+                if (it.animation != null) {
+                    if (it.animation?.isPlay() != false) it.animation?.stop()
+                    else it.animation?.play()
+                } else {
+                    it.animation = CardFlipAnimation()
+                    it.animation?.play()
+                }
+            }
+        }
     }
 
     private fun convertGlCoordinateSystem(x: Float, y: Float): FloatArray {
@@ -127,4 +132,11 @@ class GlRenderer(private val context: Context) : GLSurfaceView.Renderer {
             1 - (y / screenSize[1]) * 2f
         )
     }
+
+    private fun collisionRectangle(rec: FloatArray, position: FloatArray): Boolean {
+        return contain(min(rec[0], rec[2]), max(rec[0], rec[2]), position[0]) &&
+                contain(min(rec[1], rec[3]), max(rec[1], rec[3]), position[1])
+    }
+
+    private fun contain(start: Float, end: Float, value: Float): Boolean = value in start..end
 }

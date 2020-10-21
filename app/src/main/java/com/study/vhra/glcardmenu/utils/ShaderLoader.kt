@@ -1,7 +1,8 @@
-package com.study.vhra.glcardmenu
+package com.study.vhra.glcardmenu.utils
 
 import android.content.Context
 import android.opengl.GLES20.*
+import com.study.vhra.glcardmenu.Shader
 import java.io.BufferedReader
 import java.io.InputStreamReader
 

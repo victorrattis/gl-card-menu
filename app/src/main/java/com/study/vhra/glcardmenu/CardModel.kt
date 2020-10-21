@@ -2,13 +2,11 @@ package com.study.vhra.glcardmenu
 
 import android.opengl.GLES20
 import android.opengl.Matrix
-import android.util.Log
+import com.study.vhra.glcardmenu.anim.Animation
 import com.study.vhra.glcardmenu.utils.BufferUtils
 import com.study.vhra.glcardmenu.utils.TextureLoader
 import java.nio.FloatBuffer
 import java.nio.ShortBuffer
-import kotlin.math.max
-import kotlin.math.min
 
 class CardModel constructor(private val name: String = "default") {
     companion object {
@@ -55,7 +53,6 @@ class CardModel constructor(private val name: String = "default") {
 
     private fun getVertexCapacity(): Int = vertices.size * COORDINATE_BYTES
 
-    var position: FloatArray = FloatArray(3)
     var texture: Int = 0
 
     private var frontCoordText = floatArrayOf(0f, 0f, 0.5f, 1f)
@@ -64,6 +61,8 @@ class CardModel constructor(private val name: String = "default") {
     var mTextureDataHandle: Int = 0
 
     private var area = floatArrayOf()
+
+    var animation: Animation? = null
 
     fun setCardArea(width: Float, height: Float) {
         val halfWidth = width / 2.0f
@@ -128,14 +127,9 @@ class CardModel constructor(private val name: String = "default") {
     fun update(projection: FloatArray) {
         Matrix.setIdentityM(mvp, 0)
 
-        if (selected) {
-            Matrix.translateM(mvp, 0, 0f, 0f, -1f)
-            onUpdateCallback(mvp)
-            Matrix.scaleM(mvp, 0, 1.25f, 1.25f, 1f)
-        } else {
+        onUpdateCallback(mvp)
+        animation?.update(area, mvp)
 
-            onUpdateCallback(mvp)
-        }
         Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
     }
 
@@ -177,29 +171,17 @@ class CardModel constructor(private val name: String = "default") {
         )
     }
 
-    var selected: Boolean = false
-
-    fun measure(position: FloatArray, projection: FloatArray) {
+    fun measure(): FloatArray {
         val start = floatArrayOf(area[0], area[1], 0f, 1f)
         val end = floatArrayOf(area[2], area[3], 0f, 1f)
 
-//        update(projection)
-
         Matrix.multiplyMV(start, 0, mvp, 0, start, 0)
         Matrix.multiplyMV(end, 0, mvp, 0, end, 0)
-        val endArea = floatArrayOf(
+        return floatArrayOf(
             start[0]/start[3],
             start[1]/start[3],
             end[0]/end[3],
             end[1]/end[3]
         )
-
-        if (contain(min(endArea[0], endArea[2]), max(endArea[0], endArea[2]), position[0]) &&
-            contain(min(endArea[1], endArea[3]), max(endArea[1], endArea[3]), position[1])) {
-            Log.d("devlog", "collision: $name")
-            selected = !selected
-        }
     }
-
-    private fun contain(start: Float, end: Float, value: Float): Boolean = value in start..end
 }
